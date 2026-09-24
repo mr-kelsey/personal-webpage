@@ -9,6 +9,21 @@ NAV_LINKS: tuple[tuple[str, str], ...] = (
     ("Contact", "/contact"),
 )
 
+FONT_LINKS: tuple[Fast.Link, ...] = (
+    Fast.Link(rel="preconnect", href="https://fonts.googleapis.com"),
+    Fast.Link(rel="preconnect", href="https://fonts.gstatic.com", crossorigin=""),
+    Fast.Link(
+        rel="stylesheet",
+        href=(
+            "https://fonts.googleapis.com/css2?"
+            "family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&"
+            "family=IBM+Plex+Sans:wght@400;500;600&"
+            "family=IBM+Plex+Mono:wght@400;500&"
+            "display=swap"
+        ),
+    ),
+)
+
 
 class Layout:
     """Wraps page content in the site's shared nav and footer shell."""
@@ -16,17 +31,27 @@ class Layout:
     def __init__(self, site_title: str = "mr-kelsey") -> None:
         self.site_title = site_title
 
-    def _nav(self) -> Fast.Nav:
-        return Fast.Nav(*(Fast.A(label, href=href) for label, href in NAV_LINKS))
+    def _header(self) -> Fast.Header:
+        return Fast.Header(
+            Fast.A(self.site_title, href="/", cls="wordmark"),
+            Fast.Nav(*(Fast.A(label, href=href) for label, href in NAV_LINKS)),
+        )
 
     def _footer(self) -> Fast.Footer:
-        return Fast.Footer(f"© {self.site_title}")
+        return Fast.Footer(
+            Fast.P(f"© {self.site_title}"),
+            Fast.Nav(
+                Fast.A("LinkedIn", href="#"),
+                Fast.A("Email", href="/contact"),
+            ),
+        )
 
     def __call__(self, page_title: str, *content) -> tuple:
         return (
             Fast.Title(f"{page_title} — {self.site_title}"),
+            *FONT_LINKS,
             Fast.Link(rel="stylesheet", href="/static/css/site.css"),
-            self._nav(),
+            self._header(),
             Fast.Main(Fast.Div(*content, cls="page")),
             self._footer(),
         )

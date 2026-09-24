@@ -6,10 +6,13 @@ from app.layout import site_layout
 router = Fast.APIRouter()
 
 
-def _post_card(post) -> Fast.Div:
-    return Fast.Div(
-        Fast.A(post.title, href=f"/blog/{post.slug}"),
-        cls="post-card",
+def _post_row(post) -> Fast.Li:
+    return Fast.Li(
+        Fast.A(
+            Fast.Span(post.title, cls="row-title"),
+            href=f"/blog/{post.slug}",
+            cls="row-link",
+        )
     )
 
 
@@ -19,7 +22,7 @@ def get():
     return site_layout(
         "Blog",
         Fast.H1("Blog"),
-        *(_post_card(post) for post in posts),
+        Fast.Ul(*(_post_row(post) for post in posts), cls="row-list"),
     )
 
 
@@ -31,6 +34,7 @@ def get(slug: str):
     post = found[0]
     return site_layout(
         post.title,
+        Fast.A("Blog", href="/blog", cls="back-link"),
         Fast.H1(post.title),
-        Fast.P(post.body),
+        Fast.P(post.body, cls="lede"),
     )

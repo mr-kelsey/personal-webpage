@@ -6,11 +6,14 @@ from app.layout import site_layout
 router = Fast.APIRouter()
 
 
-def _project_card(project) -> Fast.Div:
-    return Fast.Div(
-        Fast.A(project.title, href=f"/work/{project.slug}"),
-        Fast.P(project.description),
-        cls="project-card",
+def _project_row(project) -> Fast.Li:
+    return Fast.Li(
+        Fast.A(
+            Fast.Span(project.title, cls="row-title"),
+            Fast.Span(project.description, cls="row-detail"),
+            href=f"/work/{project.slug}",
+            cls="row-link",
+        )
     )
 
 
@@ -20,7 +23,7 @@ def get():
     return site_layout(
         "Work",
         Fast.H1("Work"),
-        *(_project_card(project) for project in projects),
+        Fast.Ul(*(_project_row(project) for project in projects), cls="row-list"),
     )
 
 
@@ -32,7 +35,8 @@ def get(slug: str):
     project = found[0]
     return site_layout(
         project.title,
+        Fast.A("Work", href="/work", cls="back-link"),
         Fast.H1(project.title),
-        Fast.P(project.description),
+        Fast.P(project.description, cls="lede"),
         Fast.A(project.url, href=project.url) if project.url else None,
     )
