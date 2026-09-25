@@ -16,7 +16,7 @@ FONT_LINKS: tuple[Fast.Link, ...] = (
         rel="stylesheet",
         href=(
             "https://fonts.googleapis.com/css2?"
-            "family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&"
+            "family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&"
             "family=IBM+Plex+Sans:wght@400;500;600&"
             "family=IBM+Plex+Mono:wght@400;500&"
             "display=swap"
@@ -46,13 +46,19 @@ class Layout:
             ),
         )
 
+    def _boundary(self, position: str) -> Fast.Div:
+        return Fast.Div(cls=f"boundary boundary--{position}")
+
     def __call__(self, page_title: str, *content) -> tuple:
         return (
             Fast.Title(f"{page_title} — {self.site_title}"),
+            Fast.Link(rel="icon", href="/static/img/favicon.png", type="image/png"),
             *FONT_LINKS,
             Fast.Link(rel="stylesheet", href="/static/css/site.css"),
             self._header(),
+            self._boundary("top"),
             Fast.Main(Fast.Div(*content, cls="page")),
+            self._boundary("bottom"),
             self._footer(),
         )
 

@@ -6,9 +6,10 @@ from app.layout import site_layout
 router = Fast.APIRouter()
 
 
-def _project_row(project) -> Fast.Li:
+def _project_row(index: int, project) -> Fast.Li:
     return Fast.Li(
         Fast.A(
+            Fast.Span(f"{index:03d}", cls="row-index"),
             Fast.Span(project.title, cls="row-title"),
             Fast.Span(project.description, cls="row-detail"),
             href=f"/work/{project.slug}",
@@ -23,7 +24,10 @@ def get():
     return site_layout(
         "Work",
         Fast.H1("Work"),
-        Fast.Ul(*(_project_row(project) for project in projects), cls="row-list"),
+        Fast.Ul(
+            *(_project_row(i, project) for i, project in enumerate(projects, start=1)),
+            cls="row-list",
+        ),
     )
 
 
