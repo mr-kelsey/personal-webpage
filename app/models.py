@@ -7,7 +7,9 @@ class Project:
     slug: str = ""
     title: str = ""
     description: str = ""
+    body: str = ""
     url: str = ""
+    report_pdf: str = ""
     created_at: str = ""
 
 

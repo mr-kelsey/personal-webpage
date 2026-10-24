@@ -42,5 +42,12 @@ def get(slug: str):
         Fast.A("Work", href="/work", cls="back-link"),
         Fast.H1(project.title),
         Fast.P(project.description, cls="lede"),
-        Fast.A(project.url, href=project.url) if project.url else None,
+        *(Fast.P(paragraph) for paragraph in project.body.split("\n\n") if paragraph),
+        Fast.Div(
+            Fast.A(project.url, href=project.url) if project.url else None,
+            Fast.A("Download Report (PDF)", href=project.report_pdf)
+            if project.report_pdf
+            else None,
+            cls="project-links",
+        ),
     )

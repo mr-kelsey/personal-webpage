@@ -60,3 +60,11 @@ def test_inserted_contact_message_is_persisted(db: Database) -> None:
 def test_project_get_raises_for_unknown_id(db: Database) -> None:
     with raises(NotFoundError):
         db.projects.get(999)
+
+
+def test_inserted_project_body_is_retrievable_by_slug(db: Database) -> None:
+    db.projects.insert(
+        Project(slug="hospital-cv", title="Hospital CV", description="d", body="Full case study.", url="")
+    )
+    found = db.projects(where="slug=?", where_args=["hospital-cv"])
+    assert found[0].body == "Full case study."

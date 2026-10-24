@@ -165,6 +165,13 @@ main {
     margin-top: 1rem;
 }
 
+.project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    margin-top: 1.5rem;
+}
+
 /* Row lists (Work, Blog) — the ledger */
 
 .row-list {

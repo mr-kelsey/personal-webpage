@@ -32,3 +32,37 @@ def test_project_detail_shows_description(client: TestClient, db: Database) -> N
 def test_returns_404_for_unknown_project_slug(client: TestClient) -> None:
     response = client.get("/work/does-not-exist")
     assert response.status_code == 404
+
+
+def test_project_detail_shows_body_paragraph(client: TestClient, db: Database) -> None:
+    db.projects.insert(
+        Project(
+            slug="hospital-cv",
+            title="Hospital CV",
+            description="d",
+            body="First paragraph.\n\nSecond paragraph.",
+            url="",
+        )
+    )
+    response = client.get("/work/hospital-cv")
+    assert "Second paragraph." in response.text
+
+
+def test_project_detail_shows_report_download_link_when_set(client: TestClient, db: Database) -> None:
+    db.projects.insert(
+        Project(
+            slug="hospital-cv",
+            title="Hospital CV",
+            description="d",
+            url="",
+            report_pdf="/static/projects/hospital-cv-report.pdf",
+        )
+    )
+    response = client.get("/work/hospital-cv")
+    assert '/static/projects/hospital-cv-report.pdf' in response.text
+
+
+def test_project_detail_omits_report_download_link_when_unset(client: TestClient, db: Database) -> None:
+    db.projects.insert(Project(slug="hospital-cv", title="Hospital CV", description="d", url=""))
+    response = client.get("/work/hospital-cv")
+    assert "Download Report" not in response.text
