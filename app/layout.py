@@ -45,7 +45,8 @@ class Layout:
         return Fast.Footer(
             Fast.P(f"© {self.site_title}"),
             Fast.Nav(
-                Fast.A("LinkedIn", href="#"),
+                Fast.A("LinkedIn", href="https://www.linkedin.com/in/mr-kelsey"),
+                Fast.A("GitHub", href="https://github.com/mr-kelsey/"),
                 Fast.A("Email", href="/contact"),
             ),
         )

@@ -11,6 +11,16 @@ def test_resume_page_links_to_resume_pdf(client: TestClient) -> None:
     assert 'href="/resume.pdf"' in response.text
 
 
+def test_resume_page_has_no_placeholder_copy(client: TestClient) -> None:
+    response = client.get("/resume")
+    assert "Placeholder" not in response.text
+
+
+def test_resume_page_shows_real_job_title(client: TestClient) -> None:
+    response = client.get("/resume")
+    assert "AI Security Engineer" in response.text
+
+
 def test_returns_200_for_resume_pdf(client: TestClient) -> None:
     response = client.get("/resume.pdf")
     assert response.status_code == 200
