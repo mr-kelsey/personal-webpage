@@ -40,5 +40,5 @@ def get(slug: str):
         post.title,
         Fast.A("Blog", href="/blog", cls="back-link"),
         Fast.H1(post.title),
-        Fast.P(post.body, cls="lede"),
+        *(Fast.P(paragraph) for paragraph in post.body.split("\n\n") if paragraph),
     )
