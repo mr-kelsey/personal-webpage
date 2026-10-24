@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from fasthtml import common as Fast
+
+STYLESHEET_PATH = Path("static/css/site.css")
 
 NAV_LINKS: tuple[tuple[str, str], ...] = (
     ("Home", "/"),
@@ -49,12 +53,16 @@ class Layout:
     def _boundary(self, position: str) -> Fast.Div:
         return Fast.Div(cls=f"boundary boundary--{position}")
 
+    def _stylesheet_href(self) -> str:
+        version = int(STYLESHEET_PATH.stat().st_mtime)
+        return f"/static/css/site.css?v={version}"
+
     def __call__(self, page_title: str, *content) -> tuple:
         return (
             Fast.Title(f"{page_title} — {self.site_title}"),
             Fast.Link(rel="icon", href="/static/img/favicon.png", type="image/png"),
             *FONT_LINKS,
-            Fast.Link(rel="stylesheet", href="/static/css/site.css"),
+            Fast.Link(rel="stylesheet", href=self._stylesheet_href()),
             self._header(),
             self._boundary("top"),
             Fast.Main(Fast.Div(*content, cls="page")),
