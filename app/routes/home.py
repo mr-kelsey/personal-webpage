@@ -9,14 +9,18 @@ router = Fast.APIRouter()
 def get():
     return site_layout(
         "Home",
-        Fast.H1("I go where the failure mode is expensive."),
+        Fast.H1("Welcome, and thanks for stopping by!"),
         Fast.P(
-            "AI security engineer and machine learning engineer with a cybersecurity "
-            "degree and a decade of contract work that didn't start anywhere near a "
-            "computer. I've built the sensor-testing software the National Weather "
-            "Service used for congressional approval, the computer vision system that "
-            "catches $150K a month in medical waste before it happens, and the models "
-            "underneath both.",
+            "A master's degree in AI and a BS in cybersecurity, "
+            "plus a decade of software engineering contract work. "
+            "On the soft skill side, I've owned my own business and "
+            "was a former general manager for a multinational "
+            "corporation. Most hiring managers get nervous about a "
+            "candidate with limited time on the org chart.  Those who "
+            "don't recognize what it means: a self-starter with limited "
+            "need for tedious oversight. You just tell me what you need, "
+            "and I get it done.  Now, let's get to business and find "
+            "those failure points that are costing you money.",
             cls="lede",
         ),
         Fast.P(
