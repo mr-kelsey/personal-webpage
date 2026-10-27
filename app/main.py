@@ -1,8 +1,9 @@
 from fasthtml.common import fast_app
 
+from app.errors import not_found
 from app.routes import about, blog, contact, home, resume, work
 
-app, route = fast_app(pico=False)
+app, route = fast_app(pico=False, exception_handlers={404: not_found})
 
 for routes_module in (home, about, resume, work, blog, contact):
     routes_module.router.to_app(app)

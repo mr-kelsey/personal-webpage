@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from logging import getLogger
 from fasthtml import common as Fast
 
 from app.config import SiteConfig
@@ -10,6 +11,7 @@ from app.models import ContactMessage
 FALLBACK_TO_EMAIL = "site-owner@example.com"
 
 router = Fast.APIRouter()
+logger = getLogger(__name__)
 
 
 def _contact_form() -> Fast.Form:
@@ -45,12 +47,15 @@ def post(name: str, email: str, message: str, session):
         )
     )
     config = SiteConfig()
-    site_email_sender.send(
-        EmailMessage(
-            to=config.contact_to_email or FALLBACK_TO_EMAIL,
-            subject=f"New contact form message from {name}",
-            body=f"From: {name} <{email}>\n\n{message}",
+    try:
+        site_email_sender.send(
+            EmailMessage(
+                to=config.contact_to_email or FALLBACK_TO_EMAIL,
+                subject=f"New contact form message from {name}",
+                body=f"From: {name} <{email}>\n\n{message}",
+            )
         )
-    )
+    except Exception:
+        logger.exception("Failed to send contact form notification email")
     session["flash"] = "Thanks — I'll be in touch."
     return Fast.Redirect("/contact")
