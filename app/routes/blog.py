@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from fasthtml import common as Fast
 
-from app.auth import require_admin
+from app.auth import admin_nav, require_admin
 from app.db import site_db
 from app.layout import site_layout
 from app.models import Post
@@ -68,8 +68,9 @@ def get(session):
     posts = site_db.posts(order_by="id")
     return site_layout(
         "Manage Blog",
+        admin_nav(),
         Fast.H1("Manage Blog"),
-        Fast.A("New Post", href="/admin/blog/new"),
+        Fast.Div(Fast.A("New Post", href="/admin/blog/new"), cls="admin-action"),
         Fast.Ul(*(_admin_post_row(post) for post in posts), cls="admin-list"),
     )
 
@@ -80,6 +81,7 @@ def get(session):
         return redirect
     return site_layout(
         "New Post",
+        admin_nav(),
         Fast.H1("New Post"),
         _post_form(action="/admin/blog/new", show_slug_field=True),
     )
@@ -109,6 +111,7 @@ def get(slug: str, session):
         raise Fast.HTTPException(status_code=404)
     return site_layout(
         "Edit Post",
+        admin_nav(),
         Fast.H1("Edit Post"),
         _post_form(found[0], action=f"/admin/blog/{slug}/edit", show_slug_field=False),
     )

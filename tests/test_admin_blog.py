@@ -36,6 +36,18 @@ def test_get_admin_blog_new_returns_200(admin_client: TestClient) -> None:
     assert response.status_code == 200
 
 
+def test_admin_blog_list_shows_logout_control(admin_client: TestClient) -> None:
+    response = admin_client.get("/admin/blog")
+    assert 'action="/admin/logout"' in response.text
+
+
+def test_admin_blog_list_new_post_link_is_in_its_own_block(
+    admin_client: TestClient,
+) -> None:
+    response = admin_client.get("/admin/blog")
+    assert 'class="admin-action"' in response.text
+
+
 def test_post_admin_blog_new_creates_post(admin_client: TestClient, db: Database) -> None:
     admin_client.post("/admin/blog/new", data=VALID_POST_FORM)
     assert db.posts.count == 1

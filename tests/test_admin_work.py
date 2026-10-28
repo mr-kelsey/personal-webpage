@@ -42,6 +42,18 @@ def test_get_admin_work_new_returns_200(admin_client: TestClient) -> None:
     assert response.status_code == 200
 
 
+def test_admin_work_list_shows_logout_control(admin_client: TestClient) -> None:
+    response = admin_client.get("/admin/work")
+    assert 'action="/admin/logout"' in response.text
+
+
+def test_admin_work_list_new_project_link_is_in_its_own_block(
+    admin_client: TestClient,
+) -> None:
+    response = admin_client.get("/admin/work")
+    assert 'class="admin-action"' in response.text
+
+
 def test_post_admin_work_new_creates_project(
     admin_client: TestClient, db: Database
 ) -> None:

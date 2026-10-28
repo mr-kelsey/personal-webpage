@@ -55,3 +55,8 @@ def test_post_admin_logout_clears_session(admin_client: TestClient) -> None:
     admin_client.post("/admin/logout")
     response = admin_client.get("/admin", follow_redirects=False)
     assert response.headers["location"] == "/admin/login"
+
+
+def test_admin_dashboard_shows_logout_control(admin_client: TestClient) -> None:
+    response = admin_client.get("/admin")
+    assert 'action="/admin/logout"' in response.text
