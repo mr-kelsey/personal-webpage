@@ -1,6 +1,6 @@
 from fasthtml import common as Fast
 
-from app.auth import SESSION_KEY, admin_nav, require_admin, verify_password
+from app.auth import SESSION_KEY, admin_layout, require_admin, verify_password
 from app.layout import site_layout
 
 router = Fast.APIRouter()
@@ -43,9 +43,8 @@ def post(session):
 def get(session):
     if (redirect := require_admin(session)) is not None:
         return redirect
-    return site_layout(
+    return admin_layout(
         "Admin",
-        admin_nav(),
         Fast.H1("Admin"),
         Fast.Div(
             Fast.A("Manage Work", href="/admin/work"),

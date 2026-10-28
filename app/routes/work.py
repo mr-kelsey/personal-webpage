@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from fasthtml import common as Fast
 
-from app.auth import admin_nav, require_admin
+from app.auth import admin_layout, require_admin
 from app.db import site_db
 from app.layout import site_layout
 from app.models import Project
@@ -75,9 +75,8 @@ def get(session):
     if (redirect := require_admin(session)) is not None:
         return redirect
     projects = site_db.projects(order_by="id")
-    return site_layout(
+    return admin_layout(
         "Manage Work",
-        admin_nav(),
         Fast.H1("Manage Work"),
         Fast.Div(Fast.A("New Project", href="/admin/work/new"), cls="admin-action"),
         Fast.Ul(*(_admin_project_row(project) for project in projects), cls="admin-list"),
@@ -88,9 +87,8 @@ def get(session):
 def get(session):
     if (redirect := require_admin(session)) is not None:
         return redirect
-    return site_layout(
+    return admin_layout(
         "New Project",
-        admin_nav(),
         Fast.H1("New Project"),
         _project_form(action="/admin/work/new", show_slug_field=True),
     )
@@ -129,9 +127,8 @@ def get(slug: str, session):
     found = site_db.projects(where="slug=?", where_args=[slug])
     if not found:
         raise Fast.HTTPException(status_code=404)
-    return site_layout(
+    return admin_layout(
         "Edit Project",
-        admin_nav(),
         Fast.H1("Edit Project"),
         _project_form(
             found[0], action=f"/admin/work/{slug}/edit", show_slug_field=False

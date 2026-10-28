@@ -3,6 +3,7 @@ from hmac import compare_digest
 from fasthtml import common as Fast
 
 from app.config import SiteConfig
+from app.layout import site_layout
 
 SESSION_KEY = "is_admin"
 
@@ -36,3 +37,10 @@ def admin_nav() -> Fast.Div:
         ),
         cls="admin-nav",
     )
+
+
+def admin_layout(title: str, *content) -> tuple:
+    """The shared page shell for authenticated /admin/* pages — always
+    includes admin_nav(), so a new admin route can't render without it
+    by omission the way a bare content helper could."""
+    return site_layout(title, admin_nav(), *content)
