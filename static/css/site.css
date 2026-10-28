@@ -273,6 +273,51 @@ form button:hover {
     opacity: 0.85;
 }
 
+/* Admin */
+
+.admin-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.admin-list {
+    list-style: none;
+    max-width: 56rem;
+    margin: 2rem 0 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+}
+
+.admin-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.admin-row .row-title {
+    flex: 1;
+}
+
+.admin-row form {
+    margin: 0;
+    flex-direction: row;
+}
+
+.admin-row form button {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+}
+
+.error {
+    color: var(--brass);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
 /* Footer */
 
 footer {

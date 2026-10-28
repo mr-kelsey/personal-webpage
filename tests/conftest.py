@@ -13,6 +13,8 @@ if TYPE_CHECKING:
     from app.db import Database
     from app.email import EmailSender
 
+ADMIN_PASSWORD_FOR_TESTS = "test-admin-password"
+
 
 def _drop_app_modules() -> None:
     for module_name in list(modules):
@@ -32,6 +34,7 @@ def client(monkeypatch: MonkeyPatch) -> Iterator[TestClient]:
     close_fd(file_descriptor) # closes fd to make sure it's not orphaned
     db_path = Path(db_path)
     monkeypatch.setenv("DB_PATH", str(db_path))
+    monkeypatch.setenv("ADMIN_PASSWORD", ADMIN_PASSWORD_FOR_TESTS)
 
     _drop_app_modules()
     main_module = import_module("app.main")
@@ -61,3 +64,10 @@ def email_sender(client: TestClient) -> "EmailSender":
     """The site's EmailSender singleton — see `db` above for why this is
     fetched fresh via import_module rather than a module-level import."""
     return import_module("app.email").site_email_sender
+
+
+@fixture()
+def admin_client(client: TestClient) -> TestClient:
+    """A `client` that has already logged in as admin via the real login route."""
+    client.post("/admin/login", data={"password": ADMIN_PASSWORD_FOR_TESTS})
+    return client

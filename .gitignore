@@ -5,3 +5,4 @@ __pycache__/
 data/*.db*
 .sesskey
 *.egg-info/
+README.md

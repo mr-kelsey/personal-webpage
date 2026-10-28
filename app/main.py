@@ -1,11 +1,15 @@
 from fasthtml.common import fast_app
 
+from app.config import SiteConfig
 from app.errors import not_found
-from app.routes import about, blog, contact, health, home, resume, work
+from app.routes import about, admin, blog, contact, health, home, resume, work
 
-app, route = fast_app(pico=False, exception_handlers={404: not_found})
+config = SiteConfig()
+app, route = fast_app(
+    pico=False, exception_handlers={404: not_found}, secret_key=config.session_secret
+)
 
-for routes_module in (home, about, resume, work, blog, contact, health):
+for routes_module in (home, about, resume, work, blog, contact, health, admin):
     routes_module.router.to_app(app)
 
 # fast_app() registers a catch-all static route (any path ending in a
