@@ -142,7 +142,7 @@ main {
 }
 
 .back-link {
-    display: inline-block;
+    display: block;
     color: var(--muted);
     font-family: var(--font-mono);
     font-size: 0.85rem;
