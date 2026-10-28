@@ -3,8 +3,8 @@
    content (Work/Blog rows), echoing casework/lab-notebook numbering
    from both security and research work. One bold color, spent deliberately
    on headline rules, index numbers, and the primary action — not scattered.
-   See PLAN.md step 8; v1 (light/minimal) is kept on branch
-   design-v1-minimal-paper as a recoverable fallback. */
+   v1 (light/minimal) is kept on branch design-v1-minimal-paper as a
+   recoverable fallback. */
 
 :root {
     --canvas: #17151a;

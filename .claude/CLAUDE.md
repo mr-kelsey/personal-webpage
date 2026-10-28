@@ -1,21 +1,20 @@
 # mr-kelsey
 
-Personal resume/portfolio site for a recent grad (BS Cybersecurity, MS Applied AI) entering the job market: resume, portfolio/work, blog, and contact pages. Built with [FastHTML](https://www.fastht.ml/).
+Personal resume/portfolio site for Johnathan Kelsey (BS Cybersecurity, MS Applied AI): resume, portfolio/work, blog, admin, and contact pages. Built with [FastHTML](https://www.fastht.ml/). Live at https://mr.kelseys.site — this is an established, deployed site, not a greenfield build. The original build plan (`.claude/PLAN.md`) has been removed now that it's fully executed; its hosting details (Fly.io) were no longer accurate.
 
-**The implementation plan lives at [`.claude/PLAN.md`](.claude/PLAN.md) — read it before writing any code.** It covers project structure, build order (TDD, step by step), FastHTML/fastlite/Fly.io conventions to follow, and where to pause and check in with the user rather than pushing ahead solo (visual direction, resume/bio content, and anything that touches real cloud resources or DNS).
+## Current stack and key decisions (do not re-litigate without asking)
 
-## Key decisions already made (do not re-litigate without asking)
+- Content (Work/Blog/contact messages) in **SQLite via `fastlite`**.
+- Hosted on a **DigitalOcean droplet**: `docker-compose.yml` runs the FastHTML `app` container plus `caddy` for TLS/reverse proxy.
+- Deploys via GitHub Actions (`.github/workflows/deploy.yml`): a test gate, then SSH (a forced-command-restricted key — it can only run the deploy script, even with the private key in hand) to `deploy.sh` on the server, which health-checks `/healthz` and rolls back the image/commit on failure.
+- Content management (create/edit/delete Work & Blog entries) lives at `/admin` — single shared-password auth, deliberate simplification for a single-owner site (no multi-user, no MFA). No SSH needed for routine content edits.
+- Visual style: minimal, whitespace-heavy, typography-led, dark "case file" theme — see the header comment in `static/css/site.css` for the design rationale; the `design-v1-minimal-paper` branch holds the earlier light/minimal direction as a fallback.
+- The (gitignored, local-only) `README.md` has dev setup, deploy mechanics, and operational notes the user didn't want public.
 
-- Content (projects/posts) is stored in **SQLite via `fastlite`**, not flat files.
-- Hosting is **Fly.io**, against a domain the user already owns but hasn't pointed anywhere yet.
-- Visual style targets the feel of [alishaselena.com](https://www.alishaselena.com/) — minimal, whitespace-heavy, typography-led — adapted to a cybersecurity/applied-AI tone, not copied verbatim.
+## Content still to add (not yet written — confirm details with the user, don't invent)
 
-## Notable background to reflect in content (do not invent beyond this — confirm details with the user)
+- National Weather Service contract work.
+- The hospital-waste computer vision project.
+- Only one school AI project (composer classification) is live so far; more exist.
 
-- BS in Cybersecurity, MS in Applied AI.
-- Non-traditional career path: mostly self-employed/contract rather than a conventional job history.
-- Contract work for the **National Weather Service**.
-- A large-scale **computer vision project reducing hospital waste**.
-- Several **school projects in AI** worth presenting as portfolio pieces.
-
-This CLAUDE.md file, plus the user's own global `~/.claude/` rules (TDD, no wildcard imports, OOP where it fits, no `global` keyword, descriptive names), govern how work on this repo should proceed.
+This file, plus the user's own global `~/.claude/` rules (TDD, no wildcard imports, OOP where it fits, no `global` keyword, descriptive names), govern how work on this repo should proceed.
