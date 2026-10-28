@@ -1,6 +1,12 @@
 from starlette.testclient import TestClient
 
+from app.auth import MAX_FAILED_LOGIN_ATTEMPTS
 from conftest import ADMIN_PASSWORD_FOR_TESTS
+
+
+def _fail_login(client: TestClient, times: int) -> None:
+    for _ in range(times):
+        client.post("/admin/login", data={"password": "wrong"})
 
 
 def test_admin_login_page_returns_200(client: TestClient) -> None:
@@ -60,3 +66,48 @@ def test_post_admin_logout_clears_session(admin_client: TestClient) -> None:
 def test_admin_dashboard_shows_logout_control(admin_client: TestClient) -> None:
     response = admin_client.get("/admin")
     assert 'action="/admin/logout"' in response.text
+
+
+def test_admin_login_allows_correct_password_below_lockout_threshold(
+    client: TestClient,
+) -> None:
+    _fail_login(client, MAX_FAILED_LOGIN_ATTEMPTS - 1)
+    response = client.post(
+        "/admin/login",
+        data={"password": ADMIN_PASSWORD_FOR_TESTS},
+        follow_redirects=False,
+    )
+    assert response.headers["location"] == "/admin"
+
+
+def test_admin_login_blocks_correct_password_at_lockout_threshold(
+    client: TestClient,
+) -> None:
+    _fail_login(client, MAX_FAILED_LOGIN_ATTEMPTS)
+    response = client.post(
+        "/admin/login",
+        data={"password": ADMIN_PASSWORD_FOR_TESTS},
+        follow_redirects=False,
+    )
+    assert response.status_code == 200
+
+
+def test_admin_login_shows_lockout_message_at_threshold(client: TestClient) -> None:
+    _fail_login(client, MAX_FAILED_LOGIN_ATTEMPTS)
+    response = client.post(
+        "/admin/login", data={"password": ADMIN_PASSWORD_FOR_TESTS}
+    )
+    assert "Too many attempts" in response.text
+
+
+def test_admin_login_success_clears_failed_attempt_count(client: TestClient) -> None:
+    _fail_login(client, MAX_FAILED_LOGIN_ATTEMPTS - 1)
+    client.post("/admin/login", data={"password": ADMIN_PASSWORD_FOR_TESTS})
+    client.post("/admin/logout")
+    _fail_login(client, MAX_FAILED_LOGIN_ATTEMPTS - 1)
+    response = client.post(
+        "/admin/login",
+        data={"password": ADMIN_PASSWORD_FOR_TESTS},
+        follow_redirects=False,
+    )
+    assert response.headers["location"] == "/admin"

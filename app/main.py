@@ -1,4 +1,5 @@
 from fasthtml.common import fast_app
+from fasthtml.xtend import robots_txt
 
 from app.config import SiteConfig
 from app.errors import not_found
@@ -11,6 +12,8 @@ app, route = fast_app(
 
 for routes_module in (home, about, resume, work, blog, contact, health, admin):
     routes_module.router.to_app(app)
+
+robots_txt(app, disallow_paths=["/admin"])
 
 # fast_app() registers a catch-all static route (any path ending in a
 # recognized extension, including pdf) before we get `route` back, so it

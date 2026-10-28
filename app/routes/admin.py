@@ -1,6 +1,12 @@
 from fasthtml import common as Fast
 
-from app.auth import SESSION_KEY, admin_layout, require_admin, verify_password
+from app.auth import (
+    SESSION_KEY,
+    admin_layout,
+    login_attempt_limiter,
+    require_admin,
+    verify_password,
+)
 from app.layout import site_layout
 
 router = Fast.APIRouter()
@@ -22,13 +28,22 @@ def get():
 
 
 @router("/admin/login")
-def post(password: str, session):
+def post(password: str, session, request):
+    client_ip = request.client.host
+    if login_attempt_limiter.is_locked_out(client_ip):
+        return site_layout(
+            "Admin Login",
+            Fast.H1("Admin Login"),
+            _login_form(error="Too many attempts. Try again later."),
+        )
     if not verify_password(password):
+        login_attempt_limiter.record_failure(client_ip)
         return site_layout(
             "Admin Login",
             Fast.H1("Admin Login"),
             _login_form(error="Incorrect password."),
         )
+    login_attempt_limiter.record_success(client_ip)
     session[SESSION_KEY] = True
     return Fast.Redirect("/admin")
 
