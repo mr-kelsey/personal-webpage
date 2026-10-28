@@ -1,7 +1,13 @@
+import logging
+from typing import TYPE_CHECKING
+
 from starlette.testclient import TestClient
 
 from app.db import Database
 from app.models import Post
+
+if TYPE_CHECKING:
+    from _pytest.logging import LogCaptureFixture
 
 VALID_POST_FORM = {
     "slug": "new-post",
@@ -124,3 +130,20 @@ def test_post_admin_blog_delete_without_auth_does_not_remove(
     _insert_post(db)
     client.post("/admin/blog/new-post/delete")
     assert db.posts.count == 1
+
+
+def test_creating_post_is_logged(
+    admin_client: TestClient, caplog: "LogCaptureFixture"
+) -> None:
+    caplog.set_level(logging.INFO)
+    admin_client.post("/admin/blog/new", data=VALID_POST_FORM)
+    assert "new-post" in caplog.text
+
+
+def test_deleting_post_is_logged(
+    admin_client: TestClient, db: Database, caplog: "LogCaptureFixture"
+) -> None:
+    _insert_post(db)
+    caplog.set_level(logging.WARNING)
+    admin_client.post("/admin/blog/new-post/delete")
+    assert "new-post" in caplog.text

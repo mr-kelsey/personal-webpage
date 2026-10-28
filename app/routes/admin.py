@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from fasthtml import common as Fast
 
 from app.auth import (
@@ -10,6 +12,7 @@ from app.auth import (
 from app.layout import site_layout
 
 router = Fast.APIRouter()
+logger = getLogger(__name__)
 
 
 def _login_form(error: str | None = None) -> Fast.Form:
@@ -31,6 +34,7 @@ def get():
 def post(password: str, session, request):
     client_ip = request.client.host
     if login_attempt_limiter.is_locked_out(client_ip):
+        logger.warning("Admin login blocked by lockout from %s", client_ip)
         return site_layout(
             "Admin Login",
             Fast.H1("Admin Login"),
@@ -38,6 +42,7 @@ def post(password: str, session, request):
         )
     if not verify_password(password):
         login_attempt_limiter.record_failure(client_ip)
+        logger.warning("Admin login failed from %s", client_ip)
         return site_layout(
             "Admin Login",
             Fast.H1("Admin Login"),
@@ -45,12 +50,14 @@ def post(password: str, session, request):
         )
     login_attempt_limiter.record_success(client_ip)
     session[SESSION_KEY] = True
+    logger.info("Admin login succeeded from %s", client_ip)
     return Fast.Redirect("/admin")
 
 
 @router("/admin/logout")
 def post(session):
     session.pop(SESSION_KEY, None)
+    logger.info("Admin logged out")
     return Fast.Redirect("/admin/login")
 
 

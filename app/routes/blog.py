@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from logging import getLogger
 
 from fasthtml import common as Fast
 
@@ -8,6 +9,7 @@ from app.layout import site_layout
 from app.models import Post
 
 router = Fast.APIRouter()
+logger = getLogger(__name__)
 
 
 def _post_row(index: int, post) -> Fast.Li:
@@ -97,6 +99,7 @@ def post(session, slug: str, title: str, body: str):
             created_at=datetime.now(timezone.utc).isoformat(),
         )
     )
+    logger.info("Created post %r", slug)
     return Fast.Redirect("/admin/blog")
 
 
@@ -122,6 +125,7 @@ def post(slug: str, session, title: str, body: str):
     if not found:
         raise Fast.HTTPException(status_code=404)
     site_db.posts.update({"id": found[0].id, "title": title, "body": body})
+    logger.info("Updated post %r", slug)
     return Fast.Redirect("/admin/blog")
 
 
@@ -132,6 +136,7 @@ def post(slug: str, session):
     found = site_db.posts(where="slug=?", where_args=[slug])
     if found:
         site_db.posts.delete(found[0].id)
+        logger.warning("Deleted post %r", slug)
     return Fast.Redirect("/admin/blog")
 
 

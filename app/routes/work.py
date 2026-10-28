@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from logging import getLogger
 
 from fasthtml import common as Fast
 
@@ -8,6 +9,7 @@ from app.layout import site_layout
 from app.models import Project
 
 router = Fast.APIRouter()
+logger = getLogger(__name__)
 
 
 def _project_row(index: int, project) -> Fast.Li:
@@ -117,6 +119,7 @@ def post(
             created_at=datetime.now(timezone.utc).isoformat(),
         )
     )
+    logger.info("Created project %r", slug)
     return Fast.Redirect("/admin/work")
 
 
@@ -161,6 +164,7 @@ def post(
             "report_pdf": report_pdf,
         }
     )
+    logger.info("Updated project %r", slug)
     return Fast.Redirect("/admin/work")
 
 
@@ -171,6 +175,7 @@ def post(slug: str, session):
     found = site_db.projects(where="slug=?", where_args=[slug])
     if found:
         site_db.projects.delete(found[0].id)
+        logger.warning("Deleted project %r", slug)
     return Fast.Redirect("/admin/work")
 
 

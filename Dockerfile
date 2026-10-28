@@ -12,6 +12,12 @@ COPY static/ static/
 COPY scripts/ scripts/
 RUN mkdir -p data
 
+RUN useradd --create-home --shell /usr/sbin/nologin appuser \
+    && chown -R appuser:appuser /app
+
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 8080
 
-CMD [".venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

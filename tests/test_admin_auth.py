@@ -1,7 +1,13 @@
+import logging
+from typing import TYPE_CHECKING
+
 from starlette.testclient import TestClient
 
 from app.auth import MAX_FAILED_LOGIN_ATTEMPTS
 from conftest import ADMIN_PASSWORD_FOR_TESTS
+
+if TYPE_CHECKING:
+    from _pytest.logging import LogCaptureFixture
 
 
 def _fail_login(client: TestClient, times: int) -> None:
@@ -98,6 +104,32 @@ def test_admin_login_shows_lockout_message_at_threshold(client: TestClient) -> N
         "/admin/login", data={"password": ADMIN_PASSWORD_FOR_TESTS}
     )
     assert "Too many attempts" in response.text
+
+
+def test_successful_login_is_logged(
+    client: TestClient, caplog: "LogCaptureFixture"
+) -> None:
+    caplog.set_level(logging.INFO)
+    client.post("/admin/login", data={"password": ADMIN_PASSWORD_FOR_TESTS})
+    assert "login succeeded" in caplog.text.lower()
+
+
+def test_failed_login_is_logged(
+    client: TestClient, caplog: "LogCaptureFixture"
+) -> None:
+    caplog.set_level(logging.WARNING)
+    client.post("/admin/login", data={"password": "wrong"})
+    assert "login failed" in caplog.text.lower()
+
+
+def test_lockout_block_is_logged(
+    client: TestClient, caplog: "LogCaptureFixture"
+) -> None:
+    caplog.set_level(logging.WARNING)
+    _fail_login(client, MAX_FAILED_LOGIN_ATTEMPTS)
+    caplog.clear()
+    client.post("/admin/login", data={"password": ADMIN_PASSWORD_FOR_TESTS})
+    assert "lockout" in caplog.text.lower()
 
 
 def test_admin_login_success_clears_failed_attempt_count(client: TestClient) -> None:

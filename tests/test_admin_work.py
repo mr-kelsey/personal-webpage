@@ -1,7 +1,13 @@
+import logging
+from typing import TYPE_CHECKING
+
 from starlette.testclient import TestClient
 
 from app.db import Database
 from app.models import Project
+
+if TYPE_CHECKING:
+    from _pytest.logging import LogCaptureFixture
 
 VALID_PROJECT_FORM = {
     "slug": "new-project",
@@ -132,3 +138,20 @@ def test_post_admin_work_delete_without_auth_does_not_remove(
     _insert_project(db)
     client.post("/admin/work/new-project/delete")
     assert db.projects.count == 1
+
+
+def test_creating_project_is_logged(
+    admin_client: TestClient, caplog: "LogCaptureFixture"
+) -> None:
+    caplog.set_level(logging.INFO)
+    admin_client.post("/admin/work/new", data=VALID_PROJECT_FORM)
+    assert "new-project" in caplog.text
+
+
+def test_deleting_project_is_logged(
+    admin_client: TestClient, db: Database, caplog: "LogCaptureFixture"
+) -> None:
+    _insert_project(db)
+    caplog.set_level(logging.WARNING)
+    admin_client.post("/admin/work/new-project/delete")
+    assert "new-project" in caplog.text
